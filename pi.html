@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<head>
+	<title>А вот и здрасте</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script src="MersenneTwister.js"></script>
+	<style>
+		.out {
+			display: inline-block;
+		}
+	</style>
+</head>
+
+<body>
+	<canvas id="eView"></canvas>
+
+	<div class="out">
+		<span class="label">π = </span>
+		<span id="eOut" class="value">0</span>
+	</div>
+</body>
+
+<script>
+
+var ctx = eView.getContext('2d')
+var size = eView.width = eView.height = 640
+var total = 0
+var hit = 0
+
+var mt = new MersenneTwister
+
+!function loop() {
+	requestAnimationFrame(loop)
+
+	for(var i = 0; i < 1000; i++) math()
+
+	eOut.textContent = 4 * hit / total
+}()
+
+function math() {
+	total++
+
+
+	var x = mt.random()
+	,   y = mt.random()
+
+
+	if(x * x + y * y <= 1) {
+		hit++
+		ctx.fillStyle = 'tomato'
+
+	} else {
+		ctx.fillStyle = 'black'
+	}
+
+	ctx.fillRect(x * size |0, y * size |0, 1, 1)
+}
+</script>

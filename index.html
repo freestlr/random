@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head>
+	<title>Вихрь Мерсенна</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script src="MersenneTwisterExpose.js"></script>
+	<style>
+		.out {
+			display: inline-block;
+		}
+	</style>
+</head>
+
+<body>
+	<canvas id="eView1" class="view"></canvas>
+	<canvas id="eView2" class="view"></canvas>
+	<canvas id="eView3" class="view"></canvas>
+	<canvas id="eView4" class="view"></canvas>
+
+	<div id="eOut" class="out">
+	</div>
+</body>
+
+<script>
+
+var N = 624
+var S = 32
+
+var SX = 4
+var SY = 4
+
+var w = S * SX
+var h = N
+
+var mt = new MersenneTwister
+
+var cvs = [].slice.call(document.querySelectorAll('canvas'))
+var ctx = []
+
+var times = cvs.length
+var split = Math.floor(N / times)
+
+for(var i = 0; i < cvs.length; i++) {
+	var c = cvs[i]
+	var x = c.getContext('2d')
+
+	c.width  = w
+	c.height = h
+
+	ctx.push(x)
+
+	draw_slice(i, split * i, split * (i + 1))
+}
+
+var lastdrawn = -1
+
+
+!function loop() {
+	// setTimeout(loop, 10)
+	requestAnimationFrame(loop)
+
+
+	var r = mt.random()
+
+	var c = Math.floor((mt.index / N) * times)
+	var p = lastdrawn
+
+
+	draw_slice(c, split * c, split * (c + 1))
+	if(~p && p !== c) {
+		draw_slice(p, split * p, split * (p + 1))
+	}
+	lastdrawn = c
+
+	eOut.textContent = r
+}()
+
+function draw_slice(index, min, max) {
+	var ictx = ctx[index]
+
+	for(var y = min; y < max; y++) {
+		var block = mt.state[y]
+		,   active = y === mt.index
+
+		for(var x = 0; x < S; x++) {
+			var bit = block & (1 << x)
+
+			var val = bit ? active ? 0 : 127 : 255
+
+			ictx.fillStyle = bit ? active ? 'black' : '#888' : 'white'
+			ictx.fillRect(x * SX, (y - min) * SY, SX, SY)
+		}
+	}
+}
+
+</script>
